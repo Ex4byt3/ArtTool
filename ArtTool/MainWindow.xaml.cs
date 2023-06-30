@@ -154,9 +154,15 @@ namespace ArtTool
             CloseButton.Click += (s, e) => Close();
 
             // test image
-            RefImage sampleImageTest = new RefImage("/sample.png", 32);
+            RefImage sampleImageTest = new RefImage("./sample.png", 32);
 
             ImageWindow.DataContext = sampleImageTest;
+        }
+
+        private void Button_settings_Click(object sender, RoutedEventArgs e)
+        {
+            Settings settings = new Settings();
+            settings.Show();
         }
     }
 

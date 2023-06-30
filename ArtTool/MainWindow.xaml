@@ -33,12 +33,22 @@
             </Grid>
         </Grid>
         <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom">
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                <Button Content="1" Height="25" Width="25" Margin="2"/>
-                <Button Content="2" Height="25" Width="25" Margin="2"/>
-                <Button Content="3" Height="25" Width="25" Margin="2"/>
-                <Button Content="4" Height="25" Width="25" Margin="2"/>
-                <Button Content="5" Height="25" Width="25" Margin="2"/>
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" RenderTransformOrigin="0.552,0.448">
+                <Button Name="Button_settings"  Height="25" Width="25" Margin="2" Click="Button_settings_Click">
+                    <Image Source="/resources/icons/settings.ico" Height="18" Width="18"></Image> 
+                </Button>
+                <Button Name="Button_previous" Height="25" Width="25" Margin="2">
+                    <Image Source="/resources/icons/prev.ico" Height="15" Width="15"></Image> 
+                </Button>
+                <Button Name="Button_playpause" Height="25" Width="25" Margin="2">
+                    <Image Source="/resources/icons/playpause.ico" Height="18" Width="18"></Image> 
+                </Button>
+                <Button Name="Button_next" Height="25" Width="25" Margin="2">
+                    <Image Source="/resources/icons/next.ico" Height="15" Width="15"></Image>
+                </Button>
+                <Button Name="Button_stop" Height="25" Width="25" Margin="2">
+                    <Image Source="/resources/icons/stop.ico" Height="15" Width="15"></Image>
+                </Button>
             </StackPanel>
         </Grid>
     </Grid>
