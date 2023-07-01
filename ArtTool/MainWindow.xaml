@@ -9,7 +9,7 @@
         ResizeMode="CanResize"
         WindowStyle="None"
         AllowsTransparency="True"
-        Background="#202020">
+        Background="#151515">
 
     <WindowChrome.WindowChrome>
         <WindowChrome 
@@ -18,36 +18,41 @@
     </WindowChrome.WindowChrome>
 
     <Grid x:Name="MainGrid">
-        <Grid VerticalAlignment="Top" Background="#151515">
+        <Grid x:Name="TitleBar" VerticalAlignment="Top" Background="#151515" Height="30">
+            <Image Source="/resources/icons/at_logo.ico" Height="25" Width="25" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="2"/>
             <StackPanel Height="30" WindowChrome.IsHitTestVisibleInChrome="True" VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal">
                 <Button x:Name="MinimizeButton" Content="-" Height="25" Width="25" Margin="2"/>
                 <Button x:Name="MaximizeButton" Content="+" Height="25" Width="25" Margin="2"/>
                 <Button x:Name="CloseButton" Content="x" Height="25" Width="25" Margin="2"/>
             </StackPanel>
         </Grid>
-        <Grid Name="ImageWindow" Margin="0,30,0,30" Background="#101010">
+        <Grid Name="ImageWindow" Margin="0,30,0,30" Background="#080808">
             <Image Name="RefImage" Stretch="Uniform"
                    Source="{Binding imagePath}"/>
+            <Grid HorizontalAlignment="Right" VerticalAlignment="Top">
+                <Button Height="25" Width="25" Margin="5" Background="#3FDDDDDD"></Button>
+
+            </Grid>
             <Grid HorizontalAlignment="Right" VerticalAlignment="Bottom">
                 <TextBlock Text="{Binding duration}" Name="RemainingTime" Foreground="#E5E5E5" FontSize="30"/>
             </Grid>
         </Grid>
         <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom">
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" RenderTransformOrigin="0.552,0.448">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                 <Button Name="Button_settings"  Height="25" Width="25" Margin="2" Click="Button_settings_Click">
-                    <Image Source="/resources/icons/settings.ico" Height="18" Width="18"></Image> 
+                    <Image Source="/resources/icons/settings.ico" Height="18" Width="18"/>
                 </Button>
                 <Button Name="Button_previous" Height="25" Width="25" Margin="2">
-                    <Image Source="/resources/icons/prev.ico" Height="15" Width="15"></Image> 
+                    <Image Source="/resources/icons/prev.ico" Height="15" Width="15"/>
                 </Button>
                 <Button Name="Button_playpause" Height="25" Width="25" Margin="2">
-                    <Image Source="/resources/icons/playpause.ico" Height="18" Width="18"></Image> 
+                    <Image Source="/resources/icons/playpause.ico" Height="18" Width="18"/>
                 </Button>
                 <Button Name="Button_next" Height="25" Width="25" Margin="2">
-                    <Image Source="/resources/icons/next.ico" Height="15" Width="15"></Image>
+                    <Image Source="/resources/icons/next.ico" Height="15" Width="15"/>
                 </Button>
                 <Button Name="Button_stop" Height="25" Width="25" Margin="2">
-                    <Image Source="/resources/icons/stop.ico" Height="15" Width="15"></Image>
+                    <Image Source="/resources/icons/stop.ico" Height="15" Width="15"/>
                 </Button>
             </StackPanel>
         </Grid>

@@ -1,24 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Diagnostics;
-using System.Threading;
 using System.Windows.Threading;
+using System.Timers;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace ArtTool
 {
@@ -149,14 +138,14 @@ namespace ArtTool
                 IntPtr handle = (new WindowInteropHelper(this)).Handle;
                 HwndSource.FromHwnd(handle).AddHook(new HwndSourceHook(WindowProc));
             };
+            // window control button logic
             MinimizeButton.Click += (s, e) => WindowState = WindowState.Minimized;
             MaximizeButton.Click += (s, e) => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
             CloseButton.Click += (s, e) => Close();
 
             // test image
-            RefImage sampleImageTest = new RefImage("./sample.png", 32);
-
-            ImageWindow.DataContext = sampleImageTest;
+            RefImage sampleImageTest = new RefImage("./refs/sample.png", 101, this);
+            //~sampleImageTest();
         }
 
         private void Button_settings_Click(object sender, RoutedEventArgs e)
@@ -169,30 +158,61 @@ namespace ArtTool
 
     public partial class RefImage
     {
-        public DispatcherTimer dispatcherTimer;
+        //public DispatcherTimer dispatcherTimer;
         public TimeSpan time;
-        public string imagePath;
         public int duration;
+        ImageSourceConverter converter = new ImageSourceConverter();
+        MainWindow mainWindow = null;
+        Stopwatch stopwatch = new Stopwatch();
+        System.Timers.Timer timer = new System.Timers.Timer();
 
-        public RefImage(string imagePath, int duration)
+        public RefImage(string imagePath, int duration, MainWindow mainWindow)
         {
-            this.imagePath = imagePath;
+            this.mainWindow = mainWindow;
+            this.mainWindow.RefImage.Source = (ImageSource)converter.ConvertFromString(imagePath);
             this.duration = duration;
-            time = TimeSpan.FromSeconds(duration);
-            dispatcherTimer = new DispatcherTimer();
-            dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
-            dispatcherTimer.Tick += DispatcherTimer_Tick;
-            dispatcherTimer.Start();
+            this.timer.Interval = 1000;
+            this.timer.Enabled = true;
+            stopwatch.Start();
+            long start = 0;
+            long end = stopwatch.ElapsedMilliseconds;
+
+            //this.timer.Interval = 1000;
+            //timer.Interval = 1;
+            //timer.Enabled = true;
+            //Stopwatch sw = Stopwatch.StartNew();
+            //long start = 0;
+            //long end = sw.ElapsedMilliseconds;
+
+            //timer.Elapsed += (o, e) =>
+            //{
+            //    start = end;
+            //    end = sw.ElapsedMilliseconds;
+            //    Console.WriteLine("{0} milliseconds passed", end - start);
+            //    mainWindow.RemainingTime.Text = (end - start).ToString();
+            //};
+            //Console.ReadLine();
+
+        //    time = TimeSpan.FromSeconds(duration);
+        //    dispatcherTimer = new DispatcherTimer();
+        //    dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
+        //    dispatcherTimer.Tick += DispatcherTimer_Tick;
+        //    dispatcherTimer.Start();
         }
 
-        private void DispatcherTimer_Tick(object sender , EventArgs e)
+        //private void DispatcherTimer_Tick(object sender , EventArgs e)
+        //{
+        //    if (time == TimeSpan.Zero) dispatcherTimer.Stop();
+        //    else
+        //    {
+        //        time = time.Add(TimeSpan.FromSeconds(-1));
+        //        mainWindow.RemainingTime.Text = time.ToString(@"mm\:ss");
+        //    }
+        //}
+
+        ~RefImage()
         {
-            if (time == TimeSpan.Zero) dispatcherTimer.Stop();
-            else
-            {
-                time = time.Add(TimeSpan.FromSeconds(-1));
-                // update timer text somehow here
-            }
+            // TODO
         }
     }
 }
