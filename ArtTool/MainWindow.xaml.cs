@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -8,6 +7,9 @@ using System.Windows.Threading;
 using System.Timers;
 using System.Diagnostics;
 using System.Reflection;
+using ArtTool.ViewModels;
+using ArtTool.Views;
+
 
 namespace ArtTool
 {
@@ -16,6 +18,7 @@ namespace ArtTool
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MainWindowViewModel _viewModel;
         private static IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             switch (msg)
@@ -130,9 +133,11 @@ namespace ArtTool
         [DllImport("User32")]
         internal static extern IntPtr MonitorFromWindow(IntPtr handle, int flags);
 
+        private SettingsMenuWindow settingsMenuWindow;
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = _viewModel = new MainWindowViewModel(); // create VM
             SourceInitialized += (s, e) =>
             {
                 IntPtr handle = (new WindowInteropHelper(this)).Handle;
@@ -143,76 +148,50 @@ namespace ArtTool
             MaximizeButton.Click += (s, e) => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
             CloseButton.Click += (s, e) => Close();
 
+            // init settings window
+            settingsMenuWindow = new SettingsMenuWindow();
+
             // test image
             RefImage sampleImageTest = new RefImage("./refs/sample.png", 101, this);
             //~sampleImageTest();
         }
 
-        private void Button_settings_Click(object sender, RoutedEventArgs e)
+        private bool isSettingsMenuVisible = false;
+        private void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
-            Settings settings = new Settings();
-            settings.Show();
-        }
-    }
+            isSettingsMenuVisible = !isSettingsMenuVisible;
 
-
-    public partial class RefImage
-    {
-        //public DispatcherTimer dispatcherTimer;
-        public TimeSpan time;
-        public int duration;
-        ImageSourceConverter converter = new ImageSourceConverter();
-        MainWindow mainWindow = null;
-        Stopwatch stopwatch = new Stopwatch();
-        System.Timers.Timer timer = new System.Timers.Timer();
-
-        public RefImage(string imagePath, int duration, MainWindow mainWindow)
-        {
-            this.mainWindow = mainWindow;
-            this.mainWindow.RefImage.Source = (ImageSource)converter.ConvertFromString(imagePath);
-            this.duration = duration;
-            this.timer.Interval = 1000;
-            this.timer.Enabled = true;
-            stopwatch.Start();
-            long start = 0;
-            long end = stopwatch.ElapsedMilliseconds;
-
-            //this.timer.Interval = 1000;
-            //timer.Interval = 1;
-            //timer.Enabled = true;
-            //Stopwatch sw = Stopwatch.StartNew();
-            //long start = 0;
-            //long end = sw.ElapsedMilliseconds;
-
-            //timer.Elapsed += (o, e) =>
-            //{
-            //    start = end;
-            //    end = sw.ElapsedMilliseconds;
-            //    Console.WriteLine("{0} milliseconds passed", end - start);
-            //    mainWindow.RemainingTime.Text = (end - start).ToString();
-            //};
-            //Console.ReadLine();
-
-        //    time = TimeSpan.FromSeconds(duration);
-        //    dispatcherTimer = new DispatcherTimer();
-        //    dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
-        //    dispatcherTimer.Tick += DispatcherTimer_Tick;
-        //    dispatcherTimer.Start();
+            if (isSettingsMenuVisible)
+            {
+                SettingsMenuGrid.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                SettingsMenuGrid.Visibility = Visibility.Collapsed;
+            }
         }
 
-        //private void DispatcherTimer_Tick(object sender , EventArgs e)
-        //{
-        //    if (time == TimeSpan.Zero) dispatcherTimer.Stop();
-        //    else
-        //    {
-        //        time = time.Add(TimeSpan.FromSeconds(-1));
-        //        mainWindow.RemainingTime.Text = time.ToString(@"mm\:ss");
-        //    }
-        //}
 
-        ~RefImage()
+
+        public partial class RefImage
         {
-            // TODO
+            public int duration;
+            ImageSourceConverter converter = new ImageSourceConverter();
+            MainWindow _mainWindow = null;
+
+            public RefImage(string imagePath, int duration, MainWindow mainWindow)
+            {
+                _mainWindow = mainWindow;
+                this._mainWindow.displayedImage.Source = (ImageSource)converter.ConvertFromString(imagePath);
+                this.duration = duration;
+
+                // TODO
+            }
+
+            ~RefImage()
+            {
+                // TODO
+            }
         }
     }
 }

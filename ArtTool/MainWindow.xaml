@@ -18,6 +18,7 @@
     </WindowChrome.WindowChrome>
 
     <Grid x:Name="MainGrid">
+        <!-- Title Bar -->
         <Grid x:Name="TitleBar" VerticalAlignment="Top" Background="#151515" Height="30">
             <Image Source="/resources/icons/at_logo.ico" Height="25" Width="25" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="2"/>
             <StackPanel Height="30" WindowChrome.IsHitTestVisibleInChrome="True" VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal">
@@ -26,22 +27,49 @@
                 <Button x:Name="CloseButton" Content="x" Height="25" Width="25" Margin="2"/>
             </StackPanel>
         </Grid>
+        
+        <!-- Image Window -->
         <Grid Name="ImageWindow" Margin="0,30,0,30" Background="#080808">
-            <Image Name="RefImage" Stretch="Uniform"
-                   Source="{Binding imagePath}"/>
+            <Image Name="displayedImage" Stretch="Uniform" Source="{Binding ImagePath}"/>
             <Grid HorizontalAlignment="Right" VerticalAlignment="Top">
-                <Button Height="25" Width="25" Margin="5" Background="#3FDDDDDD"></Button>
-
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Button Name="Button_settings" Height="25" Width="25" Click="ButtonSettings_Click" Grid.Row="0" Grid.Column="1" Margin="2">
+                    <Image Source="/resources/icons/settings.ico" Height="18" Width="18"/>
+                </Button>
+                <!-- Setting Menu -->
+                <Grid x:Name="SettingsMenuGrid" Background="#25252525" Visibility="Collapsed" Grid.Row="1" Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="25"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <CheckBox Margin="5"/>
+                        <CheckBox Margin="5"/>
+                        <CheckBox Margin="5"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <Label Content="Toggle Switch 1" Foreground="White"/>
+                        <Label Content="Toggle Switch 2" Foreground="White"/>
+                        <Label Content="Toggle Switch 3" Foreground="White"/>
+                    </StackPanel>
+                </Grid>
             </Grid>
             <Grid HorizontalAlignment="Right" VerticalAlignment="Bottom">
                 <TextBlock Text="{Binding duration}" Name="RemainingTime" Foreground="#E5E5E5" FontSize="30"/>
             </Grid>
         </Grid>
+
+        <!-- Bottom Bar -->
         <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom">
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                <Button Name="Button_settings"  Height="25" Width="25" Margin="2" Click="Button_settings_Click">
-                    <Image Source="/resources/icons/settings.ico" Height="18" Width="18"/>
-                </Button>
                 <Button Name="Button_previous" Height="25" Width="25" Margin="2">
                     <Image Source="/resources/icons/prev.ico" Height="15" Width="15"/>
                 </Button>
@@ -50,9 +78,6 @@
                 </Button>
                 <Button Name="Button_next" Height="25" Width="25" Margin="2">
                     <Image Source="/resources/icons/next.ico" Height="15" Width="15"/>
-                </Button>
-                <Button Name="Button_stop" Height="25" Width="25" Margin="2">
-                    <Image Source="/resources/icons/stop.ico" Height="15" Width="15"/>
                 </Button>
             </StackPanel>
         </Grid>
