@@ -10,19 +10,14 @@ using System.Threading.Tasks;
 
 namespace ArtTool
 {
-    /// <summary>
-    /// Логика взаимодействия для Settings.xaml
-    /// </summary>
     public partial class Settings : Window
     {
         public Settings()
         {
             InitializeComponent();
-
             if (!File.Exists("settings.json")) {
                 CreateSettingsAsync();
             } 
-
         }
 
         private async void CreateSettingsAsync()
@@ -30,7 +25,7 @@ namespace ArtTool
             var imgs = new List<ImageData>();
             var ext = new List<string> { "jpg", "png" };
             var myFiles = Directory.EnumerateFiles(".\\refs", "*.*", SearchOption.AllDirectories)
-                .Where(s => ext.Contains(System.IO.Path.GetExtension(s).TrimStart('.').ToLowerInvariant()));
+                .Where(s => ext.Contains(Path.GetExtension(s).TrimStart('.').ToLowerInvariant()));
 
             foreach (string img in myFiles)
             {
