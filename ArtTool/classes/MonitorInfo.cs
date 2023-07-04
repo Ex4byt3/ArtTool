@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ArtTool
-{
+{ // no touchy
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
     public class MonitorInfo
     {
@@ -14,8 +14,5 @@ namespace ArtTool
         public ArtTool.MainWindow.RECT rcMonitor = new ArtTool.MainWindow.RECT();
         public ArtTool.MainWindow.RECT rcWork = new ArtTool.MainWindow.RECT();
         public int dwFlags = 0;
-
-
-
     }
 }

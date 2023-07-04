@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace ArtTool
@@ -18,8 +18,26 @@ namespace ArtTool
             _mainWindow = mainWindow;
             this._mainWindow.displayedImage.Source = (ImageSource)converter.ConvertFromString(imagePath);
             this.duration = duration;
+            TimerLogic();
+        }
 
-            // TODO
+        internal async Task TimerLogic()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            TimeSpan elapsed = stopwatch.Elapsed;
+            while (duration >= 0)
+            {
+                await UpdateTimer();
+                await Task.Delay(TimeSpan.FromSeconds(1));
+                duration--;
+            }
+            // something
+        }
+
+        internal async Task UpdateTimer()
+        {
+            _mainWindow.RemainingTime.Text = duration.ToString();
         }
 
         ~RefImage()

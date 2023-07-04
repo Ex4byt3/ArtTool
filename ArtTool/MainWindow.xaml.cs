@@ -154,7 +154,7 @@ namespace ArtTool
             settingsMenuWindow = new SettingsMenuWindow();
 
             // test image
-            RefImage sampleImageTest = new RefImage("./refs/sample.png", 101, this);
+            RefImage sampleImageTest = new RefImage("./refs/sample.png", 5, this);
             //~sampleImageTest();
         }
 
