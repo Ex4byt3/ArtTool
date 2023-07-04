@@ -84,11 +84,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="classes\MonitorInfo.cs" />
     <Compile Include="MVVM\Views\SettingsMenuWindow.xaml.cs">
       <DependentUpon>SettingsMenuWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MVVM\ViewModel\MainWindowViewModel.cs" />
     <Compile Include="MVVM\ViewModel\SettingsMenuViewModel.cs" />
+    <Compile Include="classes\RefImage.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>

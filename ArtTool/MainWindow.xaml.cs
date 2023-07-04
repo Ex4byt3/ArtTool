@@ -19,6 +19,11 @@ namespace ArtTool
     public partial class MainWindow : Window
     {
         private MainWindowViewModel _viewModel;
+        private SettingsMenuWindow settingsMenuWindow;
+
+        private bool isSettingsMenuVisible;
+
+        #region something Bit asked not to touch. It just works
         private static IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             switch (msg)
@@ -38,7 +43,7 @@ namespace ArtTool
             IntPtr monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
             if (monitor != IntPtr.Zero)
             {
-                MONITORINFO monitorInfo = new MONITORINFO();
+                MonitorInfo monitorInfo = new MonitorInfo();
                 GetMonitorInfo(monitor, monitorInfo);
                 RECT rcWorkArea = monitorInfo.rcWork;
                 RECT rcMonitorArea = monitorInfo.rcMonitor;
@@ -75,14 +80,7 @@ namespace ArtTool
             public POINT ptMaxTrackSize;
         };
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-        public class MONITORINFO
-        {
-            public int cbSize = Marshal.SizeOf(typeof(MONITORINFO));
-            public RECT rcMonitor = new RECT();
-            public RECT rcWork = new RECT();
-            public int dwFlags = 0;
-        }
+
 
         [StructLayout(LayoutKind.Sequential, Pack = 0)]
         public struct RECT
@@ -128,15 +126,19 @@ namespace ArtTool
         }
 
         [DllImport("user32")]
-        internal static extern bool GetMonitorInfo(IntPtr hMonitor, MONITORINFO lpmi);
+        internal static extern bool GetMonitorInfo(IntPtr hMonitor, MonitorInfo lpmi);
 
         [DllImport("User32")]
         internal static extern IntPtr MonitorFromWindow(IntPtr handle, int flags);
+        #endregion
 
-        private SettingsMenuWindow settingsMenuWindow;
+        
         public MainWindow()
         {
             InitializeComponent();
+
+            isSettingsMenuVisible = false;
+
             DataContext = _viewModel = new MainWindowViewModel(); // create VM
             SourceInitialized += (s, e) =>
             {
@@ -156,7 +158,7 @@ namespace ArtTool
             //~sampleImageTest();
         }
 
-        private bool isSettingsMenuVisible = false;
+        
         private void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
             isSettingsMenuVisible = !isSettingsMenuVisible;
@@ -168,29 +170,6 @@ namespace ArtTool
             else
             {
                 SettingsMenuGrid.Visibility = Visibility.Collapsed;
-            }
-        }
-
-
-
-        public partial class RefImage
-        {
-            public int duration;
-            ImageSourceConverter converter = new ImageSourceConverter();
-            MainWindow _mainWindow = null;
-
-            public RefImage(string imagePath, int duration, MainWindow mainWindow)
-            {
-                _mainWindow = mainWindow;
-                this._mainWindow.displayedImage.Source = (ImageSource)converter.ConvertFromString(imagePath);
-                this.duration = duration;
-
-                // TODO
-            }
-
-            ~RefImage()
-            {
-                // TODO
             }
         }
     }
