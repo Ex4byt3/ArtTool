@@ -4,9 +4,6 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
-using System.Timers;
-using System.Diagnostics;
-using System.Reflection;
 using ArtTool.ViewModels;
 using ArtTool.Views;
 using System.Threading.Tasks;
@@ -228,7 +225,14 @@ namespace ArtTool
         private async Task DrawImageLogic(string imgPath, int duration)
         {
             ImageSourceConverter converter = new ImageSourceConverter();
-            displayedImage.Source = (ImageSource)converter.ConvertFromString(imgPath); // TODO: add try catch in case of invalid file location
+            try // try-catch block in case invalid file path so it dosn't just crash
+            {
+                displayedImage.Source = (ImageSource)converter.ConvertFromString(imgPath);
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine(ex.Message); // probably display an error to the user instead, currently just shows no image and still does the countdown
+            }
             await Task.Run(() =>
             {
                 while (duration >= 0)
@@ -243,7 +247,8 @@ namespace ArtTool
                         {
                             RemainingTime.Background = Brushes.Black;
                         }
-                        RemainingTime.Text = duration.ToString();
+                        TimeSpan timeSpan = TimeSpan.FromSeconds(duration);
+                        RemainingTime.Text = string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds); // formatted to mm:ss
                     });
                     duration--;
                     Thread.Sleep(1000);
