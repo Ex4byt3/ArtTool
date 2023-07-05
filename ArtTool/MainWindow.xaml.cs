@@ -9,7 +9,11 @@ using System.Diagnostics;
 using System.Reflection;
 using ArtTool.ViewModels;
 using ArtTool.Views;
-
+using System.Threading.Tasks;
+using System.Threading;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace ArtTool
 {
@@ -132,7 +136,38 @@ namespace ArtTool
         internal static extern IntPtr MonitorFromWindow(IntPtr handle, int flags);
         #endregion
 
+
+        #region imageData struct
+        struct ImageData
+        {
+            public string imagePath;
+            public int duration;
+
+            public ImageData(string imagePath, int duration)
+            {
+                this.imagePath = imagePath;
+                this.duration = duration;
+            }
+        }
+        #endregion
         
+
+        private List<ImageData> GetData()
+        {
+            var imgs = new List<ImageData>();
+            var ext = new List<string> { "jpg", "png" };
+            var myFiles = Directory.EnumerateFiles(".\\refs", "*.*", SearchOption.AllDirectories)
+                .Where(s => ext.Contains(Path.GetExtension(s).TrimStart('.').ToLowerInvariant()));
+
+            foreach (string img in myFiles)
+            {
+                imgs.Add(new ImageData(img, 20));
+            }
+
+            return imgs;
+        }
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -154,7 +189,7 @@ namespace ArtTool
             settingsMenuWindow = new SettingsMenuWindow();
 
             // test image
-            RefImage sampleImageTest = new RefImage("./refs/sample.png", 5, this);
+            
             //~sampleImageTest();
         }
 
@@ -172,5 +207,49 @@ namespace ArtTool
                 SettingsMenuGrid.Visibility = Visibility.Collapsed;
             }
         }
+
+        private async void Button_playpause_Click(object sender, RoutedEventArgs e)
+        {
+            var imgs = GetData();
+
+            //loops thru two test images as a test
+            while (true)
+            {
+                await DrawImageLogic("./refs/sample.jpg", 5);
+                await DrawImageLogic("./refs/sample.png", 5);
+            }
+        }
+        //it just works. I really hope we won't need to touch it later.
+        #region I am so sad
+
+        private async Task DrawImageLogic(string imgPath, int duration)
+        {
+            ImageSourceConverter converter = new ImageSourceConverter();
+            displayedImage.Source = (ImageSource)converter.ConvertFromString(imgPath);
+            await Task.Run(() =>
+            {
+                while (duration >= 0)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        if (duration <= 3)
+                        {
+                            RemainingTime.Background = Brushes.Red;
+                        }
+                        else
+                        {
+                            RemainingTime.Background = Brushes.Black;
+                        }
+                        RemainingTime.Text = duration.ToString();
+                    });
+                    duration--;
+                    Thread.Sleep(1000);
+                }
+            });
+        }
+        #endregion
+
+
+
     }
 }

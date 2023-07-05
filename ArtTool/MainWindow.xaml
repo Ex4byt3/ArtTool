@@ -73,7 +73,7 @@
                 <Button Name="Button_previous" Height="25" Width="25" Margin="2">
                     <Image Source="/resources/icons/prev.ico" Height="15" Width="15"/>
                 </Button>
-                <Button Name="Button_playpause" Height="25" Width="25" Margin="2">
+                <Button Name="Button_playpause" Height="25" Width="25" Margin="2" Click="Button_playpause_Click">
                     <Image Source="/resources/icons/playpause.ico" Height="18" Width="18"/>
                 </Button>
                 <Button Name="Button_next" Height="25" Width="25" Margin="2">
