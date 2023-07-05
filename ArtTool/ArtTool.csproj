@@ -142,7 +142,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="refs\dergref1.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="sample.png" />
   </ItemGroup>
@@ -173,6 +177,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="resources\icons\at_logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="refs\dergref2.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

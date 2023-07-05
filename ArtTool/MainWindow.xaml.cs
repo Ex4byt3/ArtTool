@@ -215,17 +215,20 @@ namespace ArtTool
             //loops thru two test images as a test
             while (true)
             {
+                await DrawImageLogic("./refs/dergref1.jpg", 5);
+                await DrawImageLogic("./refs/dergref2.jpg", 5);
                 await DrawImageLogic("./refs/sample.jpg", 5);
                 await DrawImageLogic("./refs/sample.png", 5);
             }
         }
+
         //it just works. I really hope we won't need to touch it later.
         #region I am so sad
 
         private async Task DrawImageLogic(string imgPath, int duration)
         {
             ImageSourceConverter converter = new ImageSourceConverter();
-            displayedImage.Source = (ImageSource)converter.ConvertFromString(imgPath);
+            displayedImage.Source = (ImageSource)converter.ConvertFromString(imgPath); // TODO: add try catch in case of invalid file location
             await Task.Run(() =>
             {
                 while (duration >= 0)
