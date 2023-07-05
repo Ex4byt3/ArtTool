@@ -4,7 +4,13 @@
              xmlns:local="clr-namespace:ArtTool"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/ButtonStyle.xaml" />
+                <!-- Reference to ButtonStyle.xaml -->
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
-    
+
+
 </Application>

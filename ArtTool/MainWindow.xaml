@@ -11,6 +11,15 @@
         AllowsTransparency="True"
         Background="#151515">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/ButtonStyle.xaml" />
+                <!-- Reference to ButtonStyle.xaml -->
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <WindowChrome.WindowChrome>
         <WindowChrome 
         CaptionHeight="30"
@@ -27,7 +36,7 @@
                 <Button x:Name="CloseButton" Content="x" Height="25" Width="25" Margin="2"/>
             </StackPanel>
         </Grid>
-        
+
         <!-- Image Window -->
         <Grid Name="ImageWindow" Margin="0,30,0,30" Background="#080808">
             <Image Name="displayedImage" Stretch="Uniform" Source="{Binding ImagePath}"/>
@@ -44,22 +53,34 @@
                     <Image Source="/resources/icons/settings.ico" Height="18" Width="18"/>
                 </Button>
                 <!-- Setting Menu -->
-                <Grid x:Name="SettingsMenuGrid" Background="#25252525" Visibility="Collapsed" Grid.Row="1" Grid.Column="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="25"/>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <CheckBox Margin="5"/>
-                        <CheckBox Margin="5"/>
-                        <CheckBox Margin="5"/>
+                <Grid x:Name="SettingsMenuGrid" Background="#7F404040" Visibility="Visible" Grid.Row="1" Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <!-- Directory Selection -->
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="CD/" Foreground="White"/>
+                        <TextBox Margin="0,0,5,0" Width="250" x:Name="DirectoryTextBox" Grid.Column="1" Grid.Row="0" BorderBrush="#00191919" Background="#00000000" Foreground="White" TextChanged="DirectoryTextBox_TextChanged"/>
+                        <Button Content="Browse..." Click="SelectDirectory_Click" Style="{StaticResource ButtonStyle}"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="1">
-                        <Label Content="Toggle Switch 1" Foreground="White"/>
-                        <Label Content="Toggle Switch 2" Foreground="White"/>
-                        <Label Content="Toggle Switch 3" Foreground="White"/>
-                    </StackPanel>
+                    <Grid Grid.Row="1" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="25"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <!-- Toggle Switches -->
+                        <StackPanel Grid.Column="0">
+                            <CheckBox Margin="5"/>
+                            <CheckBox Margin="5"/>
+                        </StackPanel>
+                        <!-- Toggle Labels -->
+                        <StackPanel Grid.Column="1">
+                            <Label Content="Toggle Switch 2" Foreground="White"/>
+                            <Label Content="Toggle Switch 3" Foreground="White"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid HorizontalAlignment="Right" VerticalAlignment="Bottom">

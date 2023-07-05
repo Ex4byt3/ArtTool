@@ -11,6 +11,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Win32;
 
 namespace ArtTool
 {
@@ -147,7 +148,7 @@ namespace ArtTool
             }
         }
         #endregion
-        
+
 
         private List<ImageData> GetData()
         {
@@ -186,15 +187,13 @@ namespace ArtTool
             settingsMenuWindow = new SettingsMenuWindow();
 
             // test image
-            
+
             //~sampleImageTest();
         }
 
-        
+
         private void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
-            isSettingsMenuVisible = !isSettingsMenuVisible;
-
             if (isSettingsMenuVisible)
             {
                 SettingsMenuGrid.Visibility = Visibility.Visible;
@@ -203,7 +202,51 @@ namespace ArtTool
             {
                 SettingsMenuGrid.Visibility = Visibility.Collapsed;
             }
+            isSettingsMenuVisible = !isSettingsMenuVisible;
         }
+
+        // TODO: something to save and load last used settings
+
+        private void SelectDirectory_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+                CheckFileExists = false,
+                CheckPathExists = true,
+                FileName = "Select Folder",
+                Filter = "Image files (*.jpg, *.jpeg, *.png, *.gif, *.bmp)|*.jpg;*.jpeg;*.png;*.gif;*.bmp",
+                Title = "Browse..."
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                var directoryPath = Path.GetDirectoryName(dialog.FileName);
+                var imageFiles = Directory.GetFiles(directoryPath)
+                                          .Where(file => IsImageFile(file));
+
+                if (imageFiles.Any())
+                {
+                    DirectoryTextBox.Text = directoryPath;
+                    // Process the image files here
+                }
+                else
+                {
+                    // Handle the case where no image files were found in the selected directory
+                }
+            }
+        }
+
+        private bool IsImageFile(string fileName)
+        {
+            var extension = Path.GetExtension(fileName)?.ToLower();
+            return extension == ".jpg" || extension == ".jpeg" || extension == ".png" ||
+                   extension == ".gif" || extension == ".bmp";
+        }
+        private void DirectoryTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            // TODO: handle if a dir is entered manually
+        }
+
 
         private async void Button_playpause_Click(object sender, RoutedEventArgs e)
         {
@@ -255,9 +298,8 @@ namespace ArtTool
                 }
             });
         }
+
+
         #endregion
-
-
-
     }
 }
