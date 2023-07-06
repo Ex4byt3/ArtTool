@@ -238,15 +238,53 @@ namespace ArtTool
                 }
             }
         }
+        private void DirectoryTextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            textBox.Focus();
+            textBox.SelectAll();
+            e.Handled = true;
+        }
+        private void DirectoryTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (Directory.Exists(DirectoryTextBox.Text))
+            {
+                var imageFiles = Directory.GetFiles(DirectoryTextBox.Text)
+                                          .Where(file => IsImageFile(file));
+
+                if (imageFiles.Any())
+                {
+                    ButtonIndex_Click(null, null);
+                }
+                else
+                {
+                    // Handle the case where no image files were found in the selected directory
+                }
+            }
+        }
+        private void MainGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!IsTextBoxOrDescendant(e.OriginalSource as DependencyObject))
+            {
+                DirectoryTextBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            }
+        }
+        private bool IsTextBoxOrDescendant(DependencyObject element)
+        {
+            while (element != null)
+            {
+                if (element is TextBox)
+                    return true;
+
+                element = VisualTreeHelper.GetParent(element);
+            }
+            return false;
+        }
         private bool IsImageFile(string fileName)
         {
             var extension = Path.GetExtension(fileName)?.ToLower();
             return extension == ".jpg" || extension == ".jpeg" || extension == ".png" ||
                    extension == ".gif" || extension == ".bmp";
-        }
-        private void DirectoryTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            // TODO: handle if a dir is entered manually
         }
 
         private classes.ImageManager imageManager = null;
@@ -257,10 +295,10 @@ namespace ArtTool
         }
 
         // PreviewTextInput function to only allow properly formatted durations
-        private void NumberTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void DurationsTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            // Regex pattern to allow numbers and commas
-            string regexPattern = @"^(?:\d+(?:\s*,\s*|\s+))*\d*$";
+            // Regex pattern to allow numbers separated by at most 1 comma or any number of spaces or both
+            string regexPattern = @"^(?:\d+\s*,?\s*)*$";
 
             // Get the current TextBox
             TextBox textBox = (TextBox)sender;
