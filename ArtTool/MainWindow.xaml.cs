@@ -12,6 +12,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
+using System.Text.RegularExpressions;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace ArtTool
 {
@@ -227,7 +230,7 @@ namespace ArtTool
                 if (imageFiles.Any())
                 {
                     DirectoryTextBox.Text = directoryPath;
-                    // Process the image files here
+                    ButtonIndex_Click(null, null);
                 }
                 else
                 {
@@ -235,7 +238,6 @@ namespace ArtTool
                 }
             }
         }
-
         private bool IsImageFile(string fileName)
         {
             var extension = Path.GetExtension(fileName)?.ToLower();
@@ -247,19 +249,83 @@ namespace ArtTool
             // TODO: handle if a dir is entered manually
         }
 
+        private classes.ImageManager imageManager = null;
+        private void ButtonIndex_Click(object sender, RoutedEventArgs e)
+        {
+            imageManager = new classes.ImageManager();
+            imageManager.IndexImages(DirectoryTextBox.Text, ForceIndexCheckBox.IsChecked ?? false);
+        }
+
+        // PreviewTextInput function to only allow properly formatted durations
+        private void NumberTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            // Regex pattern to allow numbers and commas
+            string regexPattern = @"^(?:\d+(?:\s*,\s*|\s+))*\d*$";
+
+            // Get the current TextBox
+            TextBox textBox = (TextBox)sender;
+
+            // Create a regular expression object
+            Regex regex = new Regex(regexPattern);
+
+            // Check if the new input matches the pattern
+            bool isMatch = regex.IsMatch(textBox.Text + e.Text);
+
+            // If the input does not match, mark the event as handled
+            e.Handled = !isMatch;
+        }
+
+        // reads the text in the DuraionsTextBox and makes an array of the numbers
+        private int[] ParseDurations()
+        {
+            string input = DurationsTextBox.Text;
+
+            // Split input using regular expression pattern to handle various scenarios
+            string[] stringArray = Regex.Split(input, @"\s*,\s*|\s+");
+
+            // Remove empty entries from the resulting string array
+            stringArray = stringArray.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+
+            int[] durations = new int[stringArray.Length];
+
+            for (int i = 0; i < stringArray.Length; i++)
+            {
+                if (int.TryParse(stringArray[i], out int duration))
+                {
+                    durations[i] = duration;
+                }
+                else
+                {
+                    // Handle invalid duration values
+                    // You can display an error message or take appropriate action here
+                    throw new FormatException("Invalid duration value: " + stringArray[i]);
+                }
+            }
+
+            return durations;
+        }
 
         private async void Button_playpause_Click(object sender, RoutedEventArgs e)
         {
-            var imgs = GetData();
+            // TODO: currently can't be pasued, pressing play/pause again just makes the loop run on top of itself making the timer look very wacky
+
+            int[] durations = ParseDurations();
+
+            for (int i = 0; i < durations.Length; i++)
+            {
+                await DrawImageLogic(imageManager.GetRandomImage(), durations[i]);
+            }
+
+            //var imgs = GetData();
 
             //loops thru two test images as a test
-            while (true)
-            {
-                await DrawImageLogic("./refs/dergref1.jpg", 5);
-                await DrawImageLogic("./refs/dergref2.jpg", 5);
-                await DrawImageLogic("./refs/sample.jpg", 5);
-                await DrawImageLogic("./refs/sample.png", 5);
-            }
+            //while (true)
+            //{
+            //    await DrawImageLogic("./refs/dergref1.jpg", 5);
+            //    await DrawImageLogic("./refs/dergref2.jpg", 5);
+            //    await DrawImageLogic("./refs/sample.jpg", 5);
+            //    await DrawImageLogic("./refs/sample.png", 5);
+            //}
         }
 
         //it just works. I really hope we won't need to touch it later.
@@ -268,14 +334,15 @@ namespace ArtTool
         private async Task DrawImageLogic(string imgPath, int duration)
         {
             ImageSourceConverter converter = new ImageSourceConverter();
-            try // try-catch block in case invalid file path so it dosn't just crash
+            if (!File.Exists(imgPath))
+            {
+                Console.WriteLine("File does not exist."); // probably display an error to the user instead, currently just shows no image and still does the countdown
+            }
+            else
             {
                 displayedImage.Source = (ImageSource)converter.ConvertFromString(imgPath);
             }
-            catch (FileNotFoundException ex)
-            {
-                Console.WriteLine(ex.Message); // probably display an error to the user instead, currently just shows no image and still does the countdown
-            }
+
             await Task.Run(() =>
             {
                 while (duration >= 0)
@@ -284,11 +351,11 @@ namespace ArtTool
                     {
                         if (duration <= 3)
                         {
-                            RemainingTime.Background = Brushes.Red;
+                            RemainingTime.Background = new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)); // 50% opacity (128/255)
                         }
                         else
                         {
-                            RemainingTime.Background = Brushes.Black;
+                            RemainingTime.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0)); // 50% opacity (128/255)
                         }
                         TimeSpan timeSpan = TimeSpan.FromSeconds(duration);
                         RemainingTime.Text = string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds); // formatted to mm:ss

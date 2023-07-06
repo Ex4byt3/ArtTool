@@ -42,12 +42,13 @@
             <Image Name="displayedImage" Stretch="Uniform" Source="{Binding ImagePath}"/>
             <Grid HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Button Name="Button_settings" Height="25" Width="25" Click="ButtonSettings_Click" Grid.Row="0" Grid.Column="1" Margin="2">
                     <Image Source="/resources/icons/settings.ico" Height="18" Width="18"/>
@@ -55,30 +56,50 @@
                 <!-- Setting Menu -->
                 <Grid x:Name="SettingsMenuGrid" Background="#7F404040" Visibility="Visible" Grid.Row="1" Grid.Column="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <!-- Directory Selection -->
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="CD/" Foreground="White"/>
-                        <TextBox Margin="0,0,5,0" Width="250" x:Name="DirectoryTextBox" Grid.Column="1" Grid.Row="0" BorderBrush="#00191919" Background="#00000000" Foreground="White" TextChanged="DirectoryTextBox_TextChanged"/>
-                        <Button Content="Browse..." Click="SelectDirectory_Click" Style="{StaticResource ButtonStyle}"/>
+                        <Label Content="CD:" Foreground="White"/>
+                        <TextBox Text="Select Directory" Margin="4" Width="250" x:Name="DirectoryTextBox" Grid.Column="1" Grid.Row="0" BorderBrush="#00191919" Background="#50000000" Foreground="White" TextChanged="DirectoryTextBox_TextChanged"/>
+                        <Button HorizontalAlignment="Right" Margin="4" Content="Browse..." Click="SelectDirectory_Click" Style="{StaticResource ButtonStyle}"/>
                     </StackPanel>
                     <Grid Grid.Row="1" >
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="25"/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <!-- Toggle Switches -->
-                        <StackPanel Grid.Column="0">
-                            <CheckBox Margin="5"/>
-                            <CheckBox Margin="5"/>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Durations Input -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Label Content="Durations:" Foreground="White"/>
+                            <TextBox Margin="4" Width="218" PreviewTextInput="NumberTextBox_PreviewTextInput" x:Name="DurationsTextBox" BorderBrush="#00191919" Background="#50000000" Foreground="White"/>
                         </StackPanel>
-                        <!-- Toggle Labels -->
-                        <StackPanel Grid.Column="1">
-                            <Label Content="Toggle Switch 2" Foreground="White"/>
-                            <Label Content="Toggle Switch 3" Foreground="White"/>
+
+                        <!-- Index Button -->
+                        <Button Grid.Column="1" Margin="4" Content="Index Files" Click="ButtonIndex_Click" Style="{StaticResource ButtonStyle}"/>
+
+                        <!-- Force Index -->
+                        <StackPanel HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                            <CheckBox x:Name="ForceIndexCheckBox" Margin="5"/>
+                            <TextBlock Text="Force Index" Foreground="White" Margin="4"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <CheckBox Grid.Row="2" Grid.Column="0" Margin="5"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Loop Durations" Foreground="White" Margin="4"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+                            <CheckBox Margin="5"/>
+                            <TextBlock Text="Checkbox" Foreground="White" Margin="4"/>
                         </StackPanel>
                     </Grid>
                 </Grid>
@@ -96,6 +117,7 @@
                 </Button>
                 <Button Name="Button_playpause" Height="25" Width="25" Margin="2" Click="Button_playpause_Click">
                     <Image Source="/resources/icons/playpause.ico" Height="18" Width="18"/>
+
                 </Button>
                 <Button Name="Button_next" Height="25" Width="25" Margin="2">
                     <Image Source="/resources/icons/next.ico" Height="15" Width="15"/>

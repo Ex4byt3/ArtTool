@@ -64,6 +64,5 @@ namespace ArtTool
             Filename = filename;
             Duration = duration;
         }
-
     }
 }
