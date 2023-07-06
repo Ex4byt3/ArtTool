@@ -325,6 +325,8 @@ namespace ArtTool
             //    await DrawImageLogic("./refs/dergref2.jpg", 5);
             //    await DrawImageLogic("./refs/sample.jpg", 5);
             //    await DrawImageLogic("./refs/sample.png", 5);
+            //    await DrawImageLogic("./refs/koboldref1.png", 5);
+            //    await DrawImageLogic("./refs/koboldref2.png", 5);
             //}
         }
 
