@@ -96,14 +96,14 @@
                         </StackPanel>
 
                         <StackPanel Grid.Row="1" Orientation="Horizontal">
-                            <CheckBox x:Name="LoopDurationsCheckbox"  Grid.Row="2" Grid.Column="0" Margin="5"/>
+                            <CheckBox x:Name="LoopDurationsCheckbox"  Grid.Row="2" Grid.Column="0" Margin="5" IsChecked="False"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="Loop Durations" Foreground="White" Margin="4"/>
                         </StackPanel>
 
-                        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+                        <!--<StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
                             <CheckBox Margin="5"/>
                             <TextBlock Text="Checkbox" Foreground="White" Margin="4"/>
-                        </StackPanel>
+                        </StackPanel>-->
                     </Grid>
                 </Grid>
             </Grid>
