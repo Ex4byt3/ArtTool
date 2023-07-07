@@ -349,10 +349,14 @@ namespace ArtTool
 
             int[] durations = ParseDurations();
 
-            for (int i = 0; i < durations.Length; i++)
+            do
             {
-                await DrawImageLogic(imageManager.GetRandomImage(), durations[i]);
+                for (int i = 0; i < durations.Length; i++)
+                {
+                    await DrawImageLogic(imageManager.GetNextImage(), durations[i]);
+                }
             }
+            while (LoopDurationsCheckbox.IsChecked ?? false);
 
             //var imgs = GetData();
 

@@ -7,12 +7,15 @@ namespace ArtTool.classes
 {
     public class ImageManager
     {
-        private List<string> imageFiles;
+        private List<string> imagePaths;
+        private List<string> usedImagePaths;
+        private int imageIdx = 0;
         private Random random;
 
         public ImageManager()
         {
-            imageFiles = new List<string>();
+            imagePaths = new List<string>();
+            usedImagePaths = new List<string>();
             random = new Random();
         }
 
@@ -31,37 +34,60 @@ namespace ArtTool.classes
             if (File.Exists(indexPath) && !remakeIndex)
             {
                 // Load existing index
-                imageFiles = File.ReadAllLines(indexPath).ToList();
+                imagePaths = File.ReadAllLines(indexPath).ToList();
                 return;
             }
 
             // Index all image files in the directory
             string[] extensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
-            imageFiles = Directory.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories)
+            imagePaths = Directory.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories)
                 .Where(file => extensions.Contains(Path.GetExtension(file).ToLower()))
                 .ToList();
 
             // Save the index to a file
-            File.WriteAllLines(indexPath, imageFiles);
+            File.WriteAllLines(indexPath, imagePaths);
         }
 
-        // returns a random exact file path
-        public string GetRandomImage()
+        // if there is no next image in the usedImagePaths list return a random exact file path
+        // else read from usedImagePaths and move imageIdx accordingly
+        public string GetNextImage()
         {
-            if (imageFiles.Count == 0)
+            if (usedImagePaths.Count == imageIdx)
             {
-                Console.WriteLine("No images indexed.");
+                if (imagePaths.Count == 0)
+                {
+                    Console.WriteLine("No images indexed.");
+                    return null;
+                }
+
+                // Pick a random image from the list
+                int index = random.Next(imagePaths.Count);
+                string randomImage = imagePaths[index];
+
+                // Keeps a history
+                usedImagePaths.Add(randomImage);
+                // Remove the image from the list to prevent duplicates in a session
+                imagePaths.RemoveAt(index);
+
+                imageIdx++;
+                return randomImage;
+            }
+            else
+            {
+                imageIdx = imageIdx + 2;
+                return usedImagePaths[imageIdx-1];
+            }
+        }
+
+        // Gets the previous image that was displayed
+        public string GetPreviousImage()
+        {
+            if (imageIdx < usedImagePaths.Count)
+            {
                 return null;
             }
-
-            // Pick a random image from the list
-            int index = random.Next(imageFiles.Count);
-            string randomImage = imageFiles[index];
-
-            // Remove the image from the list to prevent duplicates in a session
-            imageFiles.RemoveAt(index);
-
-            return randomImage;
+            imageIdx = imageIdx - 2;
+            return usedImagePaths[imageIdx];
         }
     }
 }

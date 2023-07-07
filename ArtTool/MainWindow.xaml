@@ -96,7 +96,7 @@
                         </StackPanel>
 
                         <StackPanel Grid.Row="1" Orientation="Horizontal">
-                            <CheckBox Grid.Row="2" Grid.Column="0" Margin="5"/>
+                            <CheckBox x:Name="LoopDurationsCheckbox"  Grid.Row="2" Grid.Column="0" Margin="5"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="Loop Durations" Foreground="White" Margin="4"/>
                         </StackPanel>
 
