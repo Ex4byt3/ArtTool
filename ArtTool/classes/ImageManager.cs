@@ -74,20 +74,20 @@ namespace ArtTool.classes
             }
             else
             {
-                imageIdx = imageIdx + 2;
-                return usedImagePaths[imageIdx-1];
+                imageIdx++;
+                return usedImagePaths[imageIdx - 1];
             }
         }
 
         // Gets the previous image that was displayed
         public string GetPreviousImage()
         {
-            if (imageIdx < usedImagePaths.Count)
+            if (imageIdx < 2)
             {
                 return null;
             }
-            imageIdx = imageIdx - 2;
-            return usedImagePaths[imageIdx];
+            imageIdx--;
+            return usedImagePaths[imageIdx - 1];
         }
     }
 }

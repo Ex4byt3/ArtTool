@@ -40,6 +40,7 @@
         <!-- Image Window -->
         <Grid Name="ImageWindow" Margin="0,30,0,30" Background="#080808">
             <Image Name="displayedImage" Stretch="Uniform" Source="{Binding ImagePath}"/>
+            <Label Name="CenterLabel" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
             <Grid HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -91,8 +92,8 @@
 
                         <!-- Force Index -->
                         <StackPanel HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-                            <CheckBox x:Name="ForceIndexCheckBox" Margin="5"/>
-                            <TextBlock Text="Force Index" Foreground="White" Margin="4"/>
+                            <CheckBox x:Name="RemakeIndexCheckBox" Margin="5"/>
+                            <TextBlock Text="Always Remake&#x0a;Index" Foreground="White" Margin="4" TextAlignment="Center"/>
                         </StackPanel>
 
                         <StackPanel Grid.Row="1" Orientation="Horizontal">
@@ -115,16 +116,23 @@
         <!-- Bottom Bar -->
         <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom">
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                <Button Name="Button_previous" Height="25" Width="25" Margin="2">
+                
+                <Button Name="Button_previous" Height="25" Width="25" Margin="2" Click="Button_previous_Click">
                     <Image Source="/resources/icons/prev.ico" Height="15" Width="15"/>
                 </Button>
+                
                 <Button Name="Button_playpause" Height="25" Width="25" Margin="2" Click="Button_playpause_Click">
                     <Image Source="/resources/icons/playpause.ico" Height="18" Width="18"/>
-
                 </Button>
-                <Button Name="Button_next" Height="25" Width="25" Margin="2">
+
+                <Button Name="Button_stop" Height="25" Width="25" Margin="2" Click="Button_stop_Click">
+                    <Image Source="/resources/icons/stop.ico" Height="15" Width="15" RenderTransformOrigin="1,1"/>
+                </Button>
+
+                <Button Name="Button_next" Height="25" Width="25" Margin="2" Click="Button_next_Click">
                     <Image Source="/resources/icons/next.ico" Height="15" Width="15"/>
                 </Button>
+                
             </StackPanel>
         </Grid>
     </Grid>

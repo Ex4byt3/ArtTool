@@ -4,31 +4,23 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
-using ArtTool.ViewModels;
-using ArtTool.Views;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Input;
+using ArtTool.classes;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace ArtTool
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        private MainWindowViewModel _viewModel;
-        private SettingsMenuWindow settingsMenuWindow;
-
-        private bool isSettingsMenuVisible;
-
-        #region something Bit asked not to touch. It just works
+        #region Main Window Logic
         private static IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             switch (msg)
@@ -122,7 +114,7 @@ namespace ArtTool
                 if (!(obj is Rect)) { return false; }
                 return (this == (RECT)obj);
             }
-            /// <summary>Return the HashCode for this struct (not garanteed to be unique)</summary>
+            /// <summary>Return the HashCode for this struct (not guaranteed to be unique)</summary>
             public override int GetHashCode() => left.GetHashCode() + top.GetHashCode() + right.GetHashCode() + bottom.GetHashCode();
             /// <summary> Determine if 2 RECT are equal (deep compare)</summary>
             public static bool operator ==(RECT rect1, RECT rect2) { return (rect1.left == rect2.left && rect1.top == rect2.top && rect1.right == rect2.right && rect1.bottom == rect2.bottom); }
@@ -137,67 +129,63 @@ namespace ArtTool
         internal static extern IntPtr MonitorFromWindow(IntPtr handle, int flags);
         #endregion
 
-
-        #region imageData struct
-        struct ImageData
-        {
-            public string imagePath;
-            public int duration;
-
-            public ImageData(string imagePath, int duration)
-            {
-                this.imagePath = imagePath;
-                this.duration = duration;
-            }
-        }
-        #endregion
-
-
-        private List<ImageData> GetData()
-        {
-            var imgs = new List<ImageData>();
-            var ext = new List<string> { "jpg", "png" };
-            var myFiles = Directory.EnumerateFiles(".\\refs", "*.*", SearchOption.AllDirectories)
-                .Where(s => ext.Contains(Path.GetExtension(s).TrimStart('.').ToLowerInvariant()));
-
-            foreach (string img in myFiles)
-            {
-                imgs.Add(new ImageData(img, 20));
-            }
-
-            return imgs;
-        }
-
-
         public MainWindow()
         {
             InitializeComponent();
-
-            isSettingsMenuVisible = false;
-
-            DataContext = _viewModel = new MainWindowViewModel(); // create VM
             SourceInitialized += (s, e) =>
             {
                 IntPtr handle = (new WindowInteropHelper(this)).Handle;
                 HwndSource.FromHwnd(handle).AddHook(new HwndSourceHook(WindowProc));
             };
+            ReadSettingsJson();
             // window control button logic
             MinimizeButton.Click += (s, e) => WindowState = WindowState.Minimized;
             MaximizeButton.Click += (s, e) => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-            CloseButton.Click += (s, e) => Close();
-
-            // init settings window
-            settingsMenuWindow = new SettingsMenuWindow();
-
-            // test image
-
-            //~sampleImageTest();
+            CloseButton.Click += (s, e) => SaveAndClose();
         }
 
 
+        private void SaveAndClose()
+        {
+            WriteSettingsJson();
+            Close();
+        }
+
+        #region Settings Logic
+        private void ReadSettingsJson()
+        {
+            if (File.Exists("settings.json"))
+            {
+                string jsonString = File.ReadAllText("settings.json");
+                SavedSettings settings = JsonSerializer.Deserialize<SavedSettings>(jsonString);
+
+                DirectoryTextBox.Text = settings.Directory;
+                DurationsTextBox.Text = settings.Durations;
+                LoopDurationsCheckbox.IsChecked = settings.LoopDurations;
+                RemakeIndexCheckBox.IsChecked = settings.ForceIndex;
+                SettingsMenuGrid.Visibility = settings.SettingsVisible ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+        private void WriteSettingsJson()
+        {
+            SavedSettings settings = new SavedSettings
+            {
+                Directory = DirectoryTextBox.Text,
+                Durations = DurationsTextBox.Text,
+                LoopDurations = LoopDurationsCheckbox.IsChecked.Value,
+                ForceIndex = RemakeIndexCheckBox.IsChecked.Value,
+                SettingsVisible = SettingsMenuGrid.IsVisible
+            };
+
+            string jsonString = JsonSerializer.Serialize(settings, new JsonSerializerOptions());
+
+            File.WriteAllText("settings.json", jsonString);
+        }
+        #endregion
+
         private void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
-            if (isSettingsMenuVisible)
+            if (!SettingsMenuGrid.IsVisible)
             {
                 SettingsMenuGrid.Visibility = Visibility.Visible;
             }
@@ -205,7 +193,6 @@ namespace ArtTool
             {
                 SettingsMenuGrid.Visibility = Visibility.Collapsed;
             }
-            isSettingsMenuVisible = !isSettingsMenuVisible;
         }
 
         // TODO: something to save and load last used settings
@@ -254,11 +241,12 @@ namespace ArtTool
 
                 if (imageFiles.Any())
                 {
+                    CenterLabel.Content = string.Empty;
                     ButtonIndex_Click(null, null);
                 }
                 else
                 {
-                    // Handle the case where no image files were found in the selected directory
+                    CenterLabel.Content = "No Images Found";
                 }
             }
         }
@@ -287,11 +275,11 @@ namespace ArtTool
                    extension == ".gif" || extension == ".bmp";
         }
 
-        private classes.ImageManager imageManager = null;
+        private ImageManager imageManager = null;
         private void ButtonIndex_Click(object sender, RoutedEventArgs e)
         {
-            imageManager = new classes.ImageManager();
-            imageManager.IndexImages(DirectoryTextBox.Text, ForceIndexCheckBox.IsChecked ?? false);
+            imageManager = new ImageManager();
+            imageManager.IndexImages(DirectoryTextBox.Text, RemakeIndexCheckBox.IsChecked ?? false);
         }
 
         // PreviewTextInput function to only allow properly formatted durations
@@ -313,10 +301,12 @@ namespace ArtTool
             e.Handled = !isMatch;
         }
 
-        // reads the text in the DuraionsTextBox and makes an array of the numbers
+        // reads the text in the DurationsTextBox and makes an array of the numbers
         private int[] ParseDurations()
         {
             string input = DurationsTextBox.Text;
+            if (input == "")
+                return null;
 
             // Split input using regular expression pattern to handle various scenarios
             string[] stringArray = Regex.Split(input, @"\s*,\s*|\s+");
@@ -343,74 +333,145 @@ namespace ArtTool
             return durations;
         }
 
+        #region Bottom nav button logic
+        private int runningStatus = 0; // 0 = stopped // 1 = playing // 2 = paused
+        bool next = false; // if skipping current image
+        bool previous = false; // if going back to previous image
+        private void Button_previous_Click(object sender, RoutedEventArgs e)
+        {
+            if (runningStatus == 0)
+                return;
+            previous = true;
+        }
         private async void Button_playpause_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: currently can't be pasued, pressing play/pause again just makes the loop run on top of itself making the timer look very wacky
-
-            int[] durations = ParseDurations();
-
-            do
+            if (runningStatus == 0) // if the timer hasn't started, start it
             {
-                for (int i = 0; i < durations.Length; i++)
+                runningStatus = 1;
+                int[] durations;
+                if (!(DurationsTextBox.Text == ""))
                 {
-                    await DrawImageLogic(imageManager.GetNextImage(), durations[i]);
+                    durations = ParseDurations();
                 }
+                else
+                    return;
+                ButtonIndex_Click(null, null);
+                await DisplayLogic(imageManager, durations);
             }
-            while (LoopDurationsCheckbox.IsChecked ?? false);
-
-            //var imgs = GetData();
-
-            //loops thru two test images as a test
-            //while (true)
-            //{
-            //    await DrawImageLogic("./refs/dergref1.jpg", 5);
-            //    await DrawImageLogic("./refs/dergref2.jpg", 5);
-            //    await DrawImageLogic("./refs/sample.jpg", 5);
-            //    await DrawImageLogic("./refs/sample.png", 5);
-            //    await DrawImageLogic("./refs/koboldref1.png", 5);
-            //    await DrawImageLogic("./refs/koboldref2.png", 5);
-            //}
+            else if (runningStatus == 1)
+            {
+                runningStatus++; // add 1 to pause
+            }
+            else if (runningStatus == 2)
+            {
+                runningStatus--; // subtract 1 to play
+            }
         }
-
-        //it just works. I really hope we won't need to touch it later.
-        #region I am so sad
-
-        private async Task DrawImageLogic(string imgPath, int duration)
+        private void Button_stop_Click(object sender, RoutedEventArgs e)
         {
-            ImageSourceConverter converter = new ImageSourceConverter();
-            if (!File.Exists(imgPath))
-            {
-                Console.WriteLine("File does not exist."); // probably display an error to the user instead, currently just shows no image and still does the countdown
-            }
-            else
-            {
-                displayedImage.Source = (ImageSource)converter.ConvertFromString(imgPath);
-            }
-
-            await Task.Run(() =>
-            {
-                while (duration >= 0)
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        if (duration <= 3)
-                        {
-                            RemainingTime.Background = new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)); // 50% opacity (128/255)
-                        }
-                        else
-                        {
-                            RemainingTime.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0)); // 50% opacity (128/255)
-                        }
-                        TimeSpan timeSpan = TimeSpan.FromSeconds(duration);
-                        RemainingTime.Text = string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds); // formatted to mm:ss
-                    });
-                    duration--;
-                    Thread.Sleep(1000);
-                }
-            });
+            runningStatus = 0;
         }
 
-
+        private void Button_next_Click(object sender, RoutedEventArgs e)
+        {
+            if (runningStatus == 0)
+                return;
+            next = true;
+        }
         #endregion
+
+        private Stopwatch stopwatch = new Stopwatch();
+        // manages play/pause and next/prev
+        private async Task DisplayLogic(ImageManager imageManager, int[] durations)
+        {
+            for (int i = 0; i < durations.Length; i++)
+            {
+                if (runningStatus == 0) // stop button pushed
+                    break;
+
+                string imgPath;
+                if (!previous)
+                    imgPath = imageManager.GetNextImage();
+                else // if going to previous image
+                {
+                    previous = false; // reset the flag
+                    imgPath = imageManager.GetPreviousImage();
+                }
+                ImageSourceConverter converter = new ImageSourceConverter();
+                if (!File.Exists(imgPath))
+                {
+                    Console.WriteLine("File does not exist. [" + imgPath + "]"); // display an error to the user instead, currently just shows no image and still does the countdown
+                }
+                else
+                {
+                    displayedImage.Source = (ImageSource)converter.ConvertFromString(imgPath);
+                }
+                await Task.Run(() =>
+                {
+                    stopwatch.Restart();
+                    while (stopwatch.Elapsed.Seconds < durations[i])
+                    {
+                        if (runningStatus == 1)
+                        {
+                            stopwatch.Start();
+                            Dispatcher.Invoke(() =>
+                            {
+                                if (durations[i] <= 3)
+                                {
+                                    RemainingTime.Background = new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)); // 50% opacity (128/255)
+                                }
+                                else
+                                {
+                                    RemainingTime.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0)); // 50% opacity (128/255)
+                                }
+                                TimeSpan duration = TimeSpan.FromSeconds(durations[i]);
+                                RemainingTime.Text = string.Format("{0:D2}:{1:D2}", (duration - stopwatch.Elapsed).Minutes, (duration - stopwatch.Elapsed).Seconds); // formatted to mm:ss
+                            });
+                        }
+                        else if (runningStatus == 2)
+                        {
+                            stopwatch.Stop();
+                        }
+                        else if (runningStatus == 0) // stop button pushed
+                        {
+                            stopwatch.Stop();
+                            break;
+                        }
+                        // the only way next having priority over previous is if someone manages to press both buttons before the program loops again
+                        if (next)
+                        {
+                            next = false; // reset the flag
+                            break;
+                        }
+                        if (previous)
+                        {
+                            if (i < 1)
+                            {
+                                break;
+                            }
+                            i=i-2; // go back a duration
+                            break;
+                        }
+                        Thread.Sleep(10); // update rate, might not be needed
+                    }
+                });
+                if (LoopDurationsCheckbox.IsChecked == true && (i+1 >= durations.Length))
+                {
+                    i = -1;
+                }
+            }
+            runningStatus = 0;
+            displayedImage.Source = null;
+            ButtonIndex_Click(null, null);
+        }
+    }
+
+    public class SavedSettings
+    {
+        public string Directory { get; set; }
+        public string Durations { get; set; }
+        public bool LoopDurations { get; set; }
+        public bool ForceIndex { get; set; }
+        public bool SettingsVisible { get; set; }
     }
 }
