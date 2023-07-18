@@ -195,8 +195,6 @@ namespace ArtTool
             }
         }
 
-        // TODO: something to save and load last used settings
-
         private void SelectDirectory_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog
@@ -409,14 +407,15 @@ namespace ArtTool
                 await Task.Run(() =>
                 {
                     stopwatch.Restart();
-                    while (stopwatch.Elapsed.Seconds < durations[i])
+                    TimeSpan duration = TimeSpan.FromSeconds(durations[i]);
+                    while (stopwatch.Elapsed.TotalSeconds < duration.TotalSeconds)
                     {
                         if (runningStatus == 1)
                         {
                             stopwatch.Start();
                             Dispatcher.Invoke(() =>
                             {
-                                if (durations[i] <= 3)
+                                if (duration.TotalSeconds - stopwatch.Elapsed.TotalSeconds <= 4)
                                 {
                                     RemainingTime.Background = new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)); // 50% opacity (128/255)
                                 }
@@ -424,7 +423,6 @@ namespace ArtTool
                                 {
                                     RemainingTime.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0)); // 50% opacity (128/255)
                                 }
-                                TimeSpan duration = TimeSpan.FromSeconds(durations[i]);
                                 RemainingTime.Text = string.Format("{0:D2}:{1:D2}", (duration - stopwatch.Elapsed).Minutes, (duration - stopwatch.Elapsed).Seconds); // formatted to mm:ss
                             });
                         }
